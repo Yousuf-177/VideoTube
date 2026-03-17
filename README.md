@@ -1,63 +1,122 @@
-# VidTube
+# VidTube : A Full Stack Video Hosting Platform 🎥
 
 A comprehensive, full-stack video hosting platform inspired by YouTube. VidTube allows users to upload, watch, like, and comment on videos, create playlists, subscribe to channels, and interact via community tweets.
 
 The project is structured entirely around a robust Node.js/Express backend paired with a modern React.js frontend built on Vite.
 
-## Architecture Overview
+---
 
-### Backend (Node.js & Express)
+## Technical Stack & Architecture
 
-A RESTful API built with Express and MongoDB (Mongoose), handling complex aggregations, authentication, and file management.
+The application is split into two distinct environments to ensure separation of concerns, scalability, and maintainability.
 
-- **Database Models (7):** User, Video, Comment, Like (Polymorphic), Playlist, Subscription, and Tweet.
-- **Authentication:** Secure JWT-based strategy using short-lived Access Tokens and long-lived Refresh Tokens (stored securely via HttpOnly cookies).
-- **Media Storage:** Integration with Cloudinary for scalable image (avatars, covers) and video payload uploads, utilizing Multer for local temporary storage during transit.
-- **Pagination & Aggregation:** Uses `mongoose-aggregate-paginate-v2` for efficient pagination of complex nested queries (e.g., fetching a channel's videos along with subscriber counts and video likes).
-- **Security & Error Handling:** Custom ApiError and ApiResponse utility classes for consistent client communication. Global error handling middleware intercepts and formats all exceptions.
+### Backend Overview
 
-### Frontend (React & Vite)
+| Component          | Technology      | Description                                                                                         |
+| :----------------- | :-------------- | :-------------------------------------------------------------------------------------------------- |
+| **Runtime**        | Node.js         | Asynchronous, event-driven JavaScript runtime environment.                                          |
+| **Framework**      | Express.js      | Fast, unopinionated web framework for building RESTful APIs.                                        |
+| **Database**       | MongoDB         | NoSQL document database, utilizing Mongoose as the Object Data Modeling (ODM) library.              |
+| **Media Storage**  | Cloudinary      | Cloud-based service for processing, managing, and delivering video and image assets.                |
+| **Authentication** | JSON Web Tokens | Secure, stateless authentication utilizing short-lived Access Tokens and long-lived Refresh Tokens. |
 
-A highly responsive, dynamic Single Page Application (SPA) prioritizing performance and modern design aesthetics.
+### Frontend Overview
 
-- **Design System:** Built from the ground up using raw CSS Custom Properties. Features a dark-themed, glassmorphism UI with gradient accents, utilizing "Inter" and "Outfit" fonts.
-- **State Management & API Layer:** React Context API handles global authentication state. A centralized Axios instance uses request/response interceptors to automatically refresh expired access tokens silently in the background, maintaining a seamless user workflow.
-- **Routing:** React Router v6 manages Protected and Guest routes to secure application flow (e.g., redirecting unauthenticated users away from the Profile or Channel dashboards).
-- **Component Modularity:** High reuse of underlying UI atoms such as customized Loaders, skeleton loaders, and interactive Video Cards.
+| Component      | Technology      | Description                                                                                                |
+| :------------- | :-------------- | :--------------------------------------------------------------------------------------------------------- |
+| **Framework**  | React.js        | UI library for building component-based, dynamic user interfaces.                                          |
+| **Build Tool** | Vite            | Lightning-fast build tool and development server.                                                          |
+| **Routing**    | React Router v6 | Declarative routing for Single Page Applications (SPA), including Protected and Guest routes.              |
+| **API Client** | Axios           | Promise-based HTTP client configuration, featuring automated token-refresh interceptors.                   |
+| **Styling**    | Vanilla CSS     | Custom, scalable design system utilizing CSS Custom Properties (Variables) and a glassmorphism dark theme. |
+
+---
 
 ## Key Features
 
-1.  **User Authentication & Profiles:** Registration with required avatar uploads, login, password management, and profile customization (cover images, detailing).
-2.  **Video Management:** Upload capabilities, publish/unpublish toggles, video metadata updating, and video deletion.
-3.  **Community Interactions:**
-    - **Comments & Likes:** Threaded video comments and a polymorphic liking system allowing users to like videos, comments, or tweets.
-    - **Tweets:** A community feed for users to broadcast text updates to their subscribers.
-4.  **Channel System:** Dynamic channel pages displaying subscriber counts, total videos, and channel-specific media. Users can subscribe/unsubscribe to other creators.
-5.  **Organization:** Watch history tracking and the ability to curate custom playlists.
-6.  **Dashboard Analytics:** Aggregated statistics for creators showing total channel views, likes, subscriber counts, and video metrics.
+| Feature Module          | Core Capabilities                                                                                                        |
+| :---------------------- | :----------------------------------------------------------------------------------------------------------------------- |
+| **User Accounts**       | Registration with avatar/cover uploads, secure login, password management, and profile customization.                    |
+| **Video Engine**        | Video file uploads, thumbnail generation, view counting, publish/unpublish toggling, and video deletion.                 |
+| **Community**           | Threaded comments on videos, and a polymorphic liking system (capable of liking videos, comments, or tweets).            |
+| **Creator Channels**    | Public-facing creator profiles displaying aggregated statistics (subscribers, total videos) and subscription management. |
+| **Playlists & History** | Seamless tracking of user watch history and CRUD operations for custom user playlists.                                   |
 
-## Getting Started
+---
+
+## Installation and Running Guide for Developers
+
+This section provides a step-by-step walkthrough to get the entire full-stack application running on your local machine.
 
 ### Prerequisites
 
-- Node.js (v18+)
-- MongoDB instance (local or Atlas)
-- Cloudinary Account (API Key, Secret, Cloud Name)
+Before beginning, ensure your local environment contains the following tools:
 
-### Backend Setup
+1.  **Node.js**: Version 18.0 or higher is recommended. Check your version by running `node -v` in your terminal.
+2.  **Git**: For version control.
+3.  **MongoDB**: A running MongoDB instance. This can be a local installation or a cloud cluster (e.g., MongoDB Atlas). Obtain your connection string URI.
+4.  **Cloudinary Account**: Create a free account at Cloudinary and note your Cloud Name, API Key, and API Secret.
 
-1.  Navigate to the project root directory.
-2.  Install dependencies: `npm install`
-3.  Create a `.env` file based on `.env.sample` and fill in your MongoDB URI, JWT secrets, and Cloudinary credentials.
-4.  Start the development server: `npm run dev` (Runs on port 8000).
+### Step 1: Backend Setup
 
-### Frontend Setup
+The backend servers act as the data and logic core of the application.
 
-1.  Navigate to the frontend directory: `cd frontend`
-2.  Install dependencies: `npm install`
-3.  The frontend uses Vite's proxy configuration to route `/api/v1` requests to the backend (`localhost:8000`), so no local environment variables are strictly needed for the API URL in development.
-4.  Start the development server: `npm run dev` (Runs on port 5173).
+1.  **Open your terminal** and navigate to the project directory:
 
-## Testing
+    ```bash
+    cd VidTube
+    ```
 
-The backend includes a comprehensive testing script (`test_endpoints.ps1`) to validate all exposed CRUD and Authentication routes against the live server.
+2.  **Install backend dependencies**:
+
+    ```bash
+    npm install
+    ```
+
+3.  **Configure Environment Variables**:
+
+    - Locate the file named `.env.sample` in the root directory.
+    - Create a copy of this file and rename the new file to exactly `.env`.
+    - Open the `.env` file and populate the empty variables with your actual credentials:
+      - `PORT`: Keep as `8000`
+      - `MONGODB_URI`: Insert your MongoDB connection string.
+      - `ACCESS_TOKEN_SECRET` / `REFRESH_TOKEN_SECRET`: Generate long, random, secure strings.
+      - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: Insert your Cloudinary credentials.
+
+4.  **Start the Backend Server**:
+    ```bash
+    npm run dev
+    ```
+    - **Success Indicator**: The terminal should display messages indicating that MongoDB is connected and the server is actively listening on port 8000. Keep this terminal window open.
+
+### Step 2: Frontend Setup
+
+The frontend serves as the interactive user interface, proxying API requests to your local backend.
+
+1.  **Open a new terminal window** (leave the backend running in the previous one).
+
+2.  **Navigate directly into the frontend directory**:
+
+    ```bash
+    cd VidTube/frontend
+    ```
+
+3.  **Install frontend dependencies**:
+
+    ```bash
+    npm install
+    ```
+
+4.  **Start the Frontend Development Server**:
+    ```bash
+    npm run dev
+    ```
+    - **Success Indicator**: The terminal will display a local URL (typically `http://localhost:5173/`).
+
+### Step 3: Verify the Application
+
+1.  Open your preferred web browser.
+2.  Navigate to `http://localhost:5173/`.
+3.  The frontend will load. Because Vite is configured to automatically proxy `/api/v1` requests to port `8000`, the frontend interface is immediately capable of communicating with your local backend database.
+
+**Note on Proxy configuration:** If you inspect `frontend/vite.config.js`, you will observe the server proxy rule that routes all Axios API calls seamlessly to the backend server without causing CORS errors.
